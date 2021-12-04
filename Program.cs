@@ -1,4 +1,6 @@
 using yearbook.Data;
+using yearbook.GraphQL.Students;
+
 using Microsoft.EntityFrameworkCore;
 using System.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -10,9 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContextPool<appDbContext>
+builder.Services.AddPooledDbContextFactory<appDbContext>
 // allow reuse instance
 (options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddGraphQLServer()
+                .AddQueryType( d => d.Name("Query"))// add all query under the extention query
+                .AddTypeExtension<StudentQueries>();
+
 
 var app = builder.Build();
 
@@ -30,6 +36,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseEndpoints(Endpoints => {
+    Endpoints.MapGraphQL();
+});
 
 app.UseAuthorization();
 

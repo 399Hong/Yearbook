@@ -6,7 +6,9 @@ namespace yearbook.GraphQL.Students;
 
 
 
-[ExtendObjectType(name :"Query")]// tells this class is for queries
+[ExtendObjectType(name :"Query")]// enable HC to identify this class as a query class, 
+//so that we can have mutiple queries 
+
 public class StudentQueries{
 
     public IQueryable<Student> GetStudents([ScopedService] appDbContext context){

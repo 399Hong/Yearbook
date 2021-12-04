@@ -15,4 +15,8 @@ public class Student
 
     public string ?imageURI {get; set;}
 
+    public ICollection<Project> Projects { get; set; } = new List<Project>();
+
+    public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+
 }
