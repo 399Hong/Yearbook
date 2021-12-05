@@ -11,8 +11,7 @@ public class appDbContext: DbContext {
     
     public DbSet<Student> Students {get;set;}
     public DbSet<Comment> Comments {get;set;}
-    public DbSet<Student> Projects {get;set;}
-
+    public DbSet<Project> Projects {get;set;} 
     protected override void OnModelCreating( ModelBuilder mb){
 
         mb.Entity<Project>()

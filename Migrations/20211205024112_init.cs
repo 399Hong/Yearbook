@@ -5,25 +5,27 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace yearbook.Migrations
 {
-    public partial class commentsAndProjects : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Students",
-                table: "Students");
-
-            migrationBuilder.RenameTable(
+            migrationBuilder.CreateTable(
                 name: "Students",
-                newName: "Student");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_Student",
-                table: "Student",
-                column: "id");
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Github = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    imageURI = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Students", x => x.id);
+                });
 
             migrationBuilder.CreateTable(
-                name: "Project",
+                name: "Projects",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -38,11 +40,11 @@ namespace yearbook.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Project", x => x.Id);
+                    table.PrimaryKey("PK_Projects", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Project_Student_StudentId",
+                        name: "FK_Projects_Students_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "Student",
+                        principalTable: "Students",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -63,15 +65,15 @@ namespace yearbook.Migrations
                 {
                     table.PrimaryKey("PK_Comments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Comments_Project_ProjectId",
+                        name: "FK_Comments_Projects_ProjectId",
                         column: x => x.ProjectId,
-                        principalTable: "Project",
+                        principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Comments_Student_StudentId",
+                        name: "FK_Comments_Students_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "Student",
+                        principalTable: "Students",
                         principalColumn: "id");
                 });
 
@@ -86,8 +88,8 @@ namespace yearbook.Migrations
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Project_StudentId",
-                table: "Project",
+                name: "IX_Projects_StudentId",
+                table: "Projects",
                 column: "StudentId");
         }
 
@@ -97,20 +99,10 @@ namespace yearbook.Migrations
                 name: "Comments");
 
             migrationBuilder.DropTable(
-                name: "Project");
+                name: "Projects");
 
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Student",
-                table: "Student");
-
-            migrationBuilder.RenameTable(
-                name: "Student",
-                newName: "Students");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_Students",
-                table: "Students",
-                column: "id");
+            migrationBuilder.DropTable(
+                name: "Students");
         }
     }
 }

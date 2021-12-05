@@ -12,8 +12,8 @@ using yearbook.Data;
 namespace yearbook.Migrations
 {
     [DbContext(typeof(appDbContext))]
-    [Migration("20211204041410_commentsAndProjects")]
-    partial class commentsAndProjects
+    [Migration("20211205024112_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -93,7 +93,7 @@ namespace yearbook.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Project");
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("yearbook.Models.Student", b =>
@@ -117,7 +117,7 @@ namespace yearbook.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Student");
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("yearbook.Models.Comment", b =>

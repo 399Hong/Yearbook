@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace yearbook.Models;
-
 public class Student
 {
     

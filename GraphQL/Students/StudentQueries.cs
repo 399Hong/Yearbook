@@ -11,8 +11,15 @@ namespace yearbook.GraphQL.Students;
 
 public class StudentQueries{
 
+    [UseDbContext(typeof(appDbContext))]
     public IQueryable<Student> GetStudents([ScopedService] appDbContext context){
         return context.Students;
+    }
+
+    [UseDbContext(typeof(appDbContext))]
+    public Student GetStudent([GraphQLType(typeof(NonNullType<IdType>))] string id, [ScopedService] appDbContext context)
+    {
+        return context.Students.Find(int.Parse(id));
     }
 
 }

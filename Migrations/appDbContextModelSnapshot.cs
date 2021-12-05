@@ -91,7 +91,7 @@ namespace yearbook.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("Project");
+                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("yearbook.Models.Student", b =>
@@ -115,7 +115,7 @@ namespace yearbook.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Student");
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("yearbook.Models.Comment", b =>
