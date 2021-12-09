@@ -7,6 +7,7 @@ public class Comment
 {
     [Key]
     public int Id { get; set; }
+    // inconsistent name. need to be changed
 
     [Required]
     public string Content { get; set; } = null!;

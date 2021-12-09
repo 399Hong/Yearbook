@@ -1,5 +1,7 @@
 using yearbook.Data;
 using yearbook.GraphQL.Students;
+using yearbook.GraphQL.Comments;
+using yearbook.GraphQL.Projects;
 
 using Microsoft.EntityFrameworkCore;
 using System.Data.SqlClient;
@@ -16,8 +18,13 @@ builder.Services.AddPooledDbContextFactory<appDbContext>
 // allow reuse instance
 (options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddGraphQLServer()
-                .AddQueryType( d => d.Name("Query"))// add all query under the extention query
-                .AddTypeExtension<StudentQueries>();
+                .AddQueryType()// add all query under the extention query
+                .AddTypeExtension<StudentQueries>()// adding queries for every object
+                .AddTypeExtension<CommentQueries>()
+                .AddTypeExtension<ProjectQueries>()
+                .AddType<StudentResolvers>() // adding resolvers for nested query
+                .AddType<ProjectResolvers>()// naming should be changed... but im too lazy.
+                .AddType<CommentResolvers>();
 
 
 var app = builder.Build();

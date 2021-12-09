@@ -12,7 +12,7 @@ using yearbook.Data;
 namespace yearbook.Migrations
 {
     [DbContext(typeof(appDbContext))]
-    [Migration("20211205024112_init")]
+    [Migration("20211205030947_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

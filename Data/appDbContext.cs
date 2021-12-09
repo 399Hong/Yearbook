@@ -18,6 +18,7 @@ public class appDbContext: DbContext {
                             .HasOne( p => p.Student)
                             .WithMany( s => s.Projects)
                             .HasForeignKey(p => p.StudentId);
+                           // it can be deleted
         mb.Entity<Comment>()
                             .HasOne(c => c.Student)
                             .WithMany(s => s.Comments)
@@ -27,6 +28,7 @@ public class appDbContext: DbContext {
                             .HasOne( c => c.Project)
                             .WithMany( p => p.Comments)
                             .HasForeignKey( c => c.ProjectId);
+                            // it can be deleted
 
 
 
