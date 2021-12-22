@@ -4,9 +4,6 @@ using yearbook.GraphQL.Comments;
 using yearbook.GraphQL.Projects;
 
 using Microsoft.EntityFrameworkCore;
-using System.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using static System.Console;
 
 //5Kst8KDc5Ef4?x#$j_
 var builder = WebApplication.CreateBuilder(args);
@@ -14,18 +11,27 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddPooledDbContextFactory<appDbContext>
 // allow reuse instance
 (options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddGraphQLServer()
+                .AddMutationConventions(applyToAllMutations: true)
+                // trying to add input payload convension to reduce the amount of boilerplate code
+                // but can find it lol.
+                // it requirs the latest version of hc
+                // it is diffcuilt to customize input and payload.
                 .AddQueryType()// add all query under the extention query
-                .AddTypeExtension<StudentQueries>()// adding queries for every object
-                .AddTypeExtension<CommentQueries>()
-                .AddTypeExtension<ProjectQueries>()
+                    .AddTypeExtension<StudentQueries>()// adding queries for every object
+                    .AddTypeExtension<CommentQueries>()
+                    .AddTypeExtension<ProjectQueries>()
                 .AddType<StudentResolvers>() // adding resolvers for nested query
                 .AddType<ProjectResolvers>()// naming should be changed... but im too lazy.
-                .AddType<CommentResolvers>();
-
+                .AddType<CommentResolvers>()
+                .AddMutationType()
+                    .AddTypeExtension<StudentMutations>()
+                    .AddTypeExtension<ProjectMutations>()
+                    .AddTypeExtension<CommentMutations>();
 
 var app = builder.Build();
 
