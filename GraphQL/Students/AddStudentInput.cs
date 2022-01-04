@@ -4,5 +4,6 @@ public record AddStudentInput
 (
     string name,
     string github,
-    string? imageUrl);
+    string? imageUrl
+);
 

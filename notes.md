@@ -8,14 +8,41 @@ dotnet ef migrations add {name}
 dotnet ef database update
 
 ```
-
-TODO : add mutation, oauth
-TODO : fix inconsistent names
-
+# GraphQl with HotChocolate
 ## mutation.
 
 need to return the original object, and other relevant info is added by the database.
+```csharp
+    [UseDbContext(typeof(appDbContext))]
+    public async Task<Student> AddStudent(AddStudentInput input, [ScopedService] appDbContext context, CancellationToken ct){
+       
 
+       // new student object
+        var student = new Student
+        {
+            name = input.name,
+            Github= input.github,
+            imageURI = input.imageUrl,
+        };
+       context.Add(student);
+       
+       await context.SaveChangesAsync(ct);
+        // **id** automatically retrieve once its inserted into the database
+       return student;
+```
+
+# jwt authentication
+## audiance
+Audience represents the **intended recipient** of the **incoming token** or the **resource that the token grants access to**. If the value specified in this parameter doesn’t match the aud parameter in the token, the token will be rejected because it was meant to be used for accessing a different resource. Note that different security token providers have different behaviors regarding what is used as the ‘aud’ claim (some use the URI of a resource a user wants to access, others use scope names). Be sure to use an audience that makes sense given the tokens you plan to accept.
+## ValidIssuer, ValidateIssuerSigningKey use tgt (authority)
+1. validIssuer properties indicate that the token’s signature should be validated
+2. the key’s property indicating it’s issuer must match an expected value.
+
+This is an alternate way to make sure the issuer is validated without using authority. instead of authorty, the JWT’s issuer is matched against custom values that are provided by the **ValidIssuer or ValidIssuers** properties of the TokenValidationParameters object.
+
+# octokit
+https://docs.github.com/en/rest/guides/getting-started-with-the-rest-api
+https://github.com/octokit/octokit.net/blob/main/docs/getting-started.md
 
 ### valueTask
 

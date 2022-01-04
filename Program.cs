@@ -2,8 +2,13 @@ using yearbook.Data;
 using yearbook.GraphQL.Students;
 using yearbook.GraphQL.Comments;
 using yearbook.GraphQL.Projects;
-
 using Microsoft.EntityFrameworkCore;
+
+// authentication
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 
 //5Kst8KDc5Ef4?x#$j_
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +38,21 @@ builder.Services.AddGraphQLServer()
                     .AddTypeExtension<ProjectMutations>()
                     .AddTypeExtension<CommentMutations>();
 
+var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters =
+            new TokenValidationParameters
+            {
+                ValidIssuer = "issuer",
+                ValidAudience = "aud",
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = signingKey
+            };
+    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -49,11 +69,13 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication();
+
 app.UseEndpoints(Endpoints => {
     Endpoints.MapGraphQL();
 });
 
-app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",

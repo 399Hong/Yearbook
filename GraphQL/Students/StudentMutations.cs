@@ -1,13 +1,36 @@
 using yearbook.Data;
 using yearbook.Models;
+using Octokit;
 
+using static System.Console;
 
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+
+using HotChocolate.AspNetCore;
+using HotChocolate.AspNetCore.Authorization;
+
+using Microsoft.AspNetCore;
+using Microsoft.Extensions.Configuration;
 
 namespace yearbook.GraphQL.Students;
+
 
 [ExtendObjectType ("Mutation")]
 public class StudentMutations
 {   
+    private readonly IConfiguration Configuration;
+
+    public StudentMutations(IConfiguration configuration)
+    {
+        Configuration = configuration;
+        // DI
+    }
+
+
     [UseDbContext(typeof(appDbContext))]
     public async Task<Student> AddStudent(AddStudentInput input, [ScopedService] appDbContext context, CancellationToken ct){
        
@@ -38,10 +61,11 @@ public class StudentMutations
         
        
     }
+
     [UseDbContext(typeof(appDbContext))]
      public async Task<Student> EditStudentAsync(EditStudentInput input,
                 [ScopedService] appDbContext context, CancellationToken ct)
-        {
+    {
             var student = await context.Students.FindAsync(int.Parse(input.id));
 
             student.name = input.name ?? student.name;
@@ -49,7 +73,74 @@ public class StudentMutations
             student.imageURI = input.imageURI?? student.imageURI;
 
             await context.SaveChangesAsync(ct);
+            
 
             return student;
+    }
+
+
+    [UseDbContext(typeof(appDbContext))]
+    public async Task<LoginPayload> LoginAsync(LoginInput input, [ScopedService] appDbContext context, CancellationToken ct)
+    {
+        var client = new GitHubClient(new ProductHeaderValue("yearbook"));
+        //name used should represent the product, the GitHub Organization, or the GitHub username that's using Octokit.net (in that order of preference).
+        //see notes for more info
+        Console.WriteLine(input.Code);
+        Console.WriteLine(Configuration["Github:ClientID"]);
+        Console.WriteLine(Configuration["Github:ClientSecret"]);
+        var request = new OauthTokenRequest(Configuration["Github:ClientID"], Configuration["Github:ClientSecret"], input.Code);
+        // authenticated request
+        var tokenInfo = await client.Oauth.CreateAccessToken(request);
+      
+        if (tokenInfo.AccessToken == null)
+        {
+            throw new GraphQLRequestException(ErrorBuilder.New()
+                .SetMessage("Bad code")
+                .SetCode("AUTH_NOT_AUTHENTICATED")
+                .Build());
         }
+        // use access token to get user
+        client.Credentials = new Credentials(tokenInfo.AccessToken);
+
+        var user = await client.User.Current();
+        // check for exsistence of user
+        var student = await context.Students.FirstOrDefaultAsync(s => s.Github == user.Login, ct);
+
+            if (student == null)
+            { // create a student if not found
+
+                student = new Student
+                {
+                    name = user.Name ?? user.Login,
+                    Github = user.Login,
+                    imageURI= user.AvatarUrl,
+                };
+
+                context.Students.Add(student);
+                await context.SaveChangesAsync(ct);
+            }
+            WriteLine("succesful get stu");
+            // authentication successful so generate jwt token
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Secret"]));
+            var credentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new List<Claim>{
+                new Claim("id",student.id.ToString())
+
+            };
+
+            var jwtToken = new JwtSecurityToken(
+                "issuer",
+                "aud",
+                claims,
+                expires: DateTime.Now.AddDays(90),
+                signingCredentials: credentials );
+
+       
+            string token = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+            //IDX10653: The encryption algorithm 'System.String' requires a key size of at least 'System.Int32' bits. Key 'Microsoft.IdentityModel.Tokens.SymmetricSecurityKey', is of size: 'System.Int32'. (Parameter 'key')
+            // key size should longer than 'System.Int32'
+  
+            return new LoginPayload(student, token);
+    }
 }
