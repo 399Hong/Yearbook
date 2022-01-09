@@ -28,6 +28,7 @@ namespace yearbook.GraphQL.Students;
 
         private class Resolvers
         {
+            // stablish DB relationship
             public async Task<IEnumerable<Project>> GetProjects([Parent] Student student, [ScopedService] appDbContext context,
                 CancellationToken cancellationToken)
             {

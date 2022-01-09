@@ -8,13 +8,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 using HotChocolate.AspNetCore;
-using HotChocolate.AspNetCore.Authorization;
 
-using Microsoft.AspNetCore;
-using Microsoft.Extensions.Configuration;
+using System.Security.Claims;
+
+
+
+
 
 namespace yearbook.GraphQL.Students;
 
@@ -32,7 +33,8 @@ public class StudentMutations
 
 
     [UseDbContext(typeof(appDbContext))]
-    public async Task<Student> AddStudent(AddStudentInput input, [ScopedService] appDbContext context, CancellationToken ct){
+    public async Task<Student> AddStudent(AddStudentInput input, 
+    [ScopedService] appDbContext context, CancellationToken ct){
        
         var student = new Student
         {
@@ -63,10 +65,12 @@ public class StudentMutations
     }
 
     [UseDbContext(typeof(appDbContext))]
-     public async Task<Student> EditStudentAsync(EditStudentInput input,
+    //[Authorize]
+     public async Task<Student> EditStudentAsync(EditStudentInput input, ClaimsPrincipal claimsUser,
                 [ScopedService] appDbContext context, CancellationToken ct)
     {
-            var student = await context.Students.FindAsync(int.Parse(input.id));
+            var userId = claimsUser.FindFirstValue("id");
+            var student = await context.Students.FindAsync(int.Parse(userId),ct);
 
             student.name = input.name ?? student.name;
             student.Github = input.github ?? student.Github;
@@ -85,9 +89,7 @@ public class StudentMutations
         var client = new GitHubClient(new ProductHeaderValue("yearbook"));
         //name used should represent the product, the GitHub Organization, or the GitHub username that's using Octokit.net (in that order of preference).
         //see notes for more info
-        Console.WriteLine(input.Code);
-        Console.WriteLine(Configuration["Github:ClientID"]);
-        Console.WriteLine(Configuration["Github:ClientSecret"]);
+        WriteLine("here");
         var request = new OauthTokenRequest(Configuration["Github:ClientID"], Configuration["Github:ClientSecret"], input.Code);
         // authenticated request
         var tokenInfo = await client.Oauth.CreateAccessToken(request);
@@ -125,8 +127,9 @@ public class StudentMutations
             var credentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>{
-                new Claim("id",student.id.ToString())
-
+                new Claim("id",student.id.ToString()),
+                //A claim is a name value pair that represents what the subject is,
+                // not what the subject can do.
             };
 
             var jwtToken = new JwtSecurityToken(

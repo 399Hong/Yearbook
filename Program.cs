@@ -17,26 +17,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddPooledDbContextFactory<appDbContext>
-// allow reuse instance
-(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddGraphQLServer()
-                .AddMutationConventions(applyToAllMutations: true)
-                // trying to add input payload convension to reduce the amount of boilerplate code
-                // but can find it lol.
-                // it requirs the latest version of hc
-                // it is diffcuilt to customize input and payload.
-                .AddQueryType()// add all query under the extention query
-                    .AddTypeExtension<StudentQueries>()// adding queries for every object
-                    .AddTypeExtension<CommentQueries>()
-                    .AddTypeExtension<ProjectQueries>()
-                .AddType<StudentResolvers>() // adding resolvers for nested query
-                .AddType<ProjectResolvers>()// naming should be changed... but im too lazy.
-                .AddType<CommentResolvers>()
-                .AddMutationType()
-                    .AddTypeExtension<StudentMutations>()
-                    .AddTypeExtension<ProjectMutations>()
-                    .AddTypeExtension<CommentMutations>();
 
 var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]));
 
@@ -52,6 +32,32 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 IssuerSigningKey = signingKey
             };
     });
+builder.Services.AddAuthorization();
+
+builder.Services.AddPooledDbContextFactory<appDbContext>
+// allow reuse instance
+(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddGraphQLServer()
+                
+                // enable[authorize] in queries
+                .AddMutationConventions(applyToAllMutations: true)
+                // trying to add input payload convension to reduce the amount of boilerplate code
+                // but can find it lol.
+                // it requirs the latest version of hc
+                // it is diffcuilt to customize input and payload.
+                .AddQueryType()// add all query under the extention query
+                    .AddTypeExtension<StudentQueries>()// adding queries for every object
+                    .AddTypeExtension<CommentQueries>()
+                    .AddTypeExtension<ProjectQueries>()
+                .AddType<StudentResolvers>() // adding resolvers for nested query
+                .AddType<ProjectResolvers>()// naming should be changed... but im too lazy.
+                .AddType<CommentResolvers>()
+                .AddMutationType()
+                    .AddTypeExtension<StudentMutations>()
+                    .AddTypeExtension<ProjectMutations>()
+                    .AddTypeExtension<CommentMutations>()
+                .AddAuthorization();
+
 
 var app = builder.Build();
 
@@ -71,6 +77,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();
+app.UseAuthorization();
+
 
 app.UseEndpoints(Endpoints => {
     Endpoints.MapGraphQL();

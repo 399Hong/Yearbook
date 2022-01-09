@@ -30,7 +30,8 @@ need to return the original object, and other relevant info is added by the data
         // **id** automatically retrieve once its inserted into the database
        return student;
 ```
-
+# authentication
+https://www.learmoreseekmore.com/2021/03/part1-hotchocolate-graphql-custom-authentication-series-using-pure-code-first-technique-user-registration.html
 # jwt authentication
 ## audiance
 Audience represents the **intended recipient** of the **incoming token** or the **resource that the token grants access to**. If the value specified in this parameter doesn’t match the aud parameter in the token, the token will be rejected because it was meant to be used for accessing a different resource. Note that different security token providers have different behaviors regarding what is used as the ‘aud’ claim (some use the URI of a resource a user wants to access, others use scope names). Be sure to use an audience that makes sense given the tokens you plan to accept.
@@ -39,6 +40,13 @@ Audience represents the **intended recipient** of the **incoming token** or the 
 2. the key’s property indicating it’s issuer must match an expected value.
 
 This is an alternate way to make sure the issuer is validated without using authority. instead of authorty, the JWT’s issuer is matched against custom values that are provided by the **ValidIssuer or ValidIssuers** properties of the TokenValidationParameters object.
+
+## JwtSecurityToken
+it should be at least 128bit.
+otherwise
+> Error: IDX10653: The encryption algorithm 'System.String' requires a key size of at least 'System.Int32' bits. Key 'Microsoft.IdentityModel.Tokens.SymmetricSecurityKey', is of size: 'System.Int32'. (Parameter 'key')
+
+
 
 # octokit
 https://docs.github.com/en/rest/guides/getting-started-with-the-rest-api

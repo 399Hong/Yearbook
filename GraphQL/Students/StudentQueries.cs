@@ -1,6 +1,10 @@
-using HotChocolate.Types;
+
 using yearbook.Data;
 using yearbook.Models;
+
+using System.Security.Claims;
+using HotChocolate.AspNetCore.Authorization;
+
 
 namespace yearbook.GraphQL.Students;
 
@@ -21,5 +25,13 @@ public class StudentQueries{
     {
         return context.Students.Find(int.Parse(id));
     }
+    // [UseDbContext(typeof(appDbContext))]
+    // [Authorize]
+    // public Student GetSelf(ClaimsPrincipal claimsPrincipal, [ScopedService] appDbContext context)
+    // {
+    //     var studentIdStr = claimsPrincipal.FindFirstValue("id");
+
+    //     return context.Students.Find(int.Parse(studentIdStr));
+    // }
 
 }
