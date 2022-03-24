@@ -46,7 +46,7 @@ export const Footer = ({ iconInfo, msg }: props) => (
                 </Grid>
 
                 <Grid item  >
-                    {iconInfo.map(x => < SocialIcon {...x }/> )}
+                    {iconInfo.map((x,index) => < SocialIcon key = {index}{...x }/> )}
 
                 </Grid>
 

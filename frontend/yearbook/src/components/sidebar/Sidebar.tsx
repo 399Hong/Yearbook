@@ -35,7 +35,7 @@ export const Sidebar = () => {
                         <ListItemText primary={icon[1]} />
                     </ListItemButton>
 
-                )};
+                )}
             </List>
         </Box >
 

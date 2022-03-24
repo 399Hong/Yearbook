@@ -1,19 +1,19 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { Sidebar } from './Sidebar';
+import { SubmitForm } from './SubmitForm';
 
 
 export default {
-    title: 'Components/Sidebar',
-    component: Sidebar
+    title: 'Components/SubmitForm',
+    component: SubmitForm 
 
-} as ComponentMeta<typeof Sidebar>;
+} as ComponentMeta<typeof SubmitForm >;
 
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
-const Template: ComponentStory<typeof Sidebar> = () => <Sidebar />;
+const Template: ComponentStory<typeof SubmitForm > = () => <SubmitForm  />;
 
 
-export const BasicSidebar = Template.bind({});
+export const BasicSubmitForm = Template.bind({});
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
 // BasicSidebar.args = {
 //     i
